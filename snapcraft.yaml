@@ -32,6 +32,7 @@ apps:
     plugs:
       - network
       - network-bind
+      - desktop-launch
 
 parts:
   junction:
@@ -41,6 +42,7 @@ parts:
     override-pull: |
       craftctl default
       craftctl set version=$(git describe --tags --abbrev=10 | tr -d 'v')
+      sed -i.bak -e 's|re.sonny.Junction.desktop|junction_junction.desktop|g' $CRAFT_PART_SRC/src/*.js
     plugin: meson
     meson-parameters:
       - --prefix=/snap/junction/current/usr
