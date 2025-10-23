@@ -1,0 +1,53 @@
+name: junction
+base: core24
+grade: stable
+confinement: strict
+adopt-info: junction
+
+slots:
+  dbus-junction:
+    interface: dbus
+    bus: session
+    name: re.sonny.Junction
+
+plugs:
+  desktop:
+    desktop-file-ids:
+      - re.sonny.Junction
+
+layout:
+  /usr/share/libdrm:
+    bind: $SNAP/usr/share/libdrm
+  /etc/vulkan:
+    bind: $SNAP/etc/vulkan
+  
+apps:
+  junction:
+    extensions: [gnome]
+    environment:
+      GI_TYPELIB_PATH: $SNAP/gnome-platform/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/girepository-1.0:$SNAP/gnome-platform/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/gjs/girepository-1.0
+    command: usr/bin/re.sonny.Junction
+    desktop: usr/share/applications/re.sonny.Junction.desktop
+    common-id: re.sonny.Junction.desktop
+    plugs:
+      - network
+      - network-bind
+
+parts:
+  junction:
+    source: https://github.com/sonnyp/junction.git
+    source-tag: v1.9
+    source-depth: 1
+    override-pull: |
+      craftctl default
+      craftctl set version=$(git describe --tags --abbrev=10 | tr -d 'v')
+    plugin: meson
+    meson-parameters:
+      - --prefix=/snap/junction/current/usr
+      - --buildtype=release
+    parse-info: [usr/share/metainfo/re.sonny.Junction.metainfo.xml]
+    build-packages:
+      - blueprint-compiler
+      - libgjs-dev
+    organize:
+      snap/junction/current/usr: usr
